@@ -2,6 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 import os
+
 base_dir = os.path.abspath(os.path.dirname(__file__))
 base_path = os.path.join(base_dir, "VishMat")
 load_dotenv()
@@ -12,9 +13,15 @@ PDF_FILES = {
 }
 #-----------------------------------------------------------------------------------------------------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Привіт! 👋 Я бот для збереження твоїх конспектів 📚✨.")
-    await update.message.reply_text("📋 Список доступних команд: /help 🛠️")
-    await update.message.reply_text("🎓 Ось доступні предмети:", reply_markup=main_keyboard())
+    keyboard = [
+        [InlineKeyboardButton("📚 Список предметів", callback_data='main_keyboard')],
+        [InlineKeyboardButton("ℹ️ Про бота", callback_data='about_command')],
+        [InlineKeyboardButton("🛠️ Допомога", callback_data='help_command')]
+    ]
+    await update.message.reply_text(
+        "Привіт! 👋 Я бот для збереження твоїх конспектів 📚✨.\n\nОберіть дію:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 #-----------------------------------------------------------------------------------------------------------------------
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     about_text = (
@@ -41,13 +48,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(help_text, reply_markup=InlineKeyboardMarkup(keyboard))
 #-----------------------------------------------------------------------------------------------------------------------
-async def show_subjects(update, context):
+async def show_subjects(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Ось доступні предмети: 📚", reply_markup=main_keyboard())
 #-----------------------------------------------------------------------------------------------------------------------
 def main_keyboard():
     keyboard = [
         [InlineKeyboardButton("Вища математика📐", callback_data='VishMat')],
-        [InlineKeyboardButton("Потрібна допомога?🆘", callback_data='help_command')],
+        [InlineKeyboardButton("Потрібна допомога?🆘", callback_data='help_command')]
     ]
     return InlineKeyboardMarkup(keyboard)
 #-----------------------------------------------------------------------------------------------------------------------
@@ -167,8 +174,23 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             help_text,
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
+    # -----------------------------------------------------------------------------------------------------------------------
+    elif query.data == "about_command":
+        about_text = (
+            "👋 Привіт! Я бот для збереження конспектів 📚\n\n"
+            "Тут ти можеш швидко знаходити та завантажувати лекції з різних предметів.\n"
+            "Команди:\n"
+            "/start — почати роботу з ботом\n"
+            "/list — список доступних предметів\n"
+            "/help — допомога по командам\n"
+            "/about — інформація про бота\n\n"
+            "Створено з ❤️ для твого зручного навчання!"
+        )
+        keyboard = [[InlineKeyboardButton("⬅️ В головне меню", callback_data='main_keyboard')]]
+        await replace_message(query, context, about_text, reply_markup=InlineKeyboardMarkup(keyboard))
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data in PDF_FILES:
+        await context.bot.send_message(chat_id=chat_id, text="Завантажую файл, зачекайте... ⏳")
         file_path = PDF_FILES[query.data]
         if os.path.exists(file_path):
             try:
