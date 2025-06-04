@@ -4,13 +4,21 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Mess
 import os
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-base_path = os.path.join(base_dir, "VishMat")
+vishmat_path = os.path.join(base_dir, "VishMat")
+org_itbizn_path = os.path.join(base_dir, "OrgItBizn")
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-PDF_FILES = {
-    f"VishMat_Lec{i}": os.path.join(base_path, f"lec{i}.pdf")
+PDF_FILES_vishmat = {
+    f"VishMat_Lec{i}": os.path.join(vishmat_path, f"lec{i}.pdf")
     for i in range(1, 33)
 }
+PDF_FILES_OrgItBizn = {
+    f"OrgItBizn_Lec{i}": os.path.join(org_itbizn_path, f"lec{i}.pdf")
+    for i in range(1, 9)
+}
+PDF_FILES = {}
+PDF_FILES.update(PDF_FILES_vishmat)
+PDF_FILES.update(PDF_FILES_OrgItBizn)
 #-----------------------------------------------------------------------------------------------------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -54,6 +62,7 @@ async def show_subjects(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main_keyboard():
     keyboard = [
         [InlineKeyboardButton("Вища математика📐", callback_data='VishMat')],
+        [InlineKeyboardButton("Організація IT бізнесу💼", callback_data='OrgItBizn')],
         [InlineKeyboardButton("Потрібна допомога?🆘", callback_data='help_command')]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -61,6 +70,13 @@ def main_keyboard():
 def back_to_topics_keyboard_vishmat():
     keyboard = [
         [InlineKeyboardButton("⬅️ Назад до тем", callback_data='back_to_topics')]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+#-----------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------
+def back_to_topics_keyboard_OrgItBizn():
+    keyboard = [
+        [InlineKeyboardButton("⬅️ Назад до тем", callback_data='back_to_topicsOrgItBizn')],
     ]
     return InlineKeyboardMarkup(keyboard)
 #-----------------------------------------------------------------------------------------------------------------------
@@ -127,6 +143,20 @@ def topics_keyboard_vishmat4():
     ]
     return InlineKeyboardMarkup(keyboard)
 #-----------------------------------------------------------------------------------------------------------------------
+def topics_keyboard_OrgItBizn():
+    keyboard = [
+        [InlineKeyboardButton("📌Лекція 1. Вступ до курсу «Організація ІТ-бізнесу». Що таке ІТ-продук та продуктова ІТ-компанія?", callback_data='OrgItBizn_Lec1')],
+        [InlineKeyboardButton("📌Лекція 2. Як шукати ідею продукту та рішення? Стратегії. SWOT-аналіз.", callback_data='OrgItBizn_Lec2')],
+        [InlineKeyboardButton("📌Лекція 3. Продуктова аналітика. Аналіз ринку. GTM-стратегія.", callback_data='OrgItBizn_Lec3')],
+        [InlineKeyboardButton("📌Лекція 4. Модель Lean Canvas для спільної роботи над продуктом.", callback_data='OrgItBizn_Lec4')],
+        [InlineKeyboardButton("📌Лекція 5. Продуктовий дизайн та розробка MVP.", callback_data='OrgItBizn_Lec5')],
+        [InlineKeyboardButton("📌Лекція 6. Поведінка користувачів в ІТ.", callback_data='OrgItBizn_Lec6')],
+        [InlineKeyboardButton("📌Лекція 7. ІТ-професії та створення власного CV.", callback_data='OrgItBizn_Lec7')],
+        [InlineKeyboardButton("📌Лекція 8. Пітчдеки стартапів для залучення інвесторів.", callback_data='OrgItBizn_Lec8')],
+        [InlineKeyboardButton("⬅️В головне меню", callback_data='main_keyboard')]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+#-----------------------------------------------------------------------------------------------------------------------
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -141,6 +171,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # -----------------------------------------------------------------------------------------------------------------------
     if query.data == "VishMat":
         await replace_message(query, context, "Ви обрали Вищу математику 📐 Оберіть тему (показані перші 8 тем):", reply_markup=topics_keyboard_vishmat())
+# -----------------------------------------------------------------------------------------------------------------------
+    elif query.data == "OrgItBizn":
+        await replace_message(query, context, "Ви обрали Організацію IT бізнесу. Показані всі теми.", reply_markup=topics_keyboard_OrgItBizn())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "main_keyboard":
         await replace_message(query, context, "Ось доступні предмети: 🔍", reply_markup=main_keyboard())
@@ -159,6 +192,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "topics_keyboard_vishmat4":
         await replace_message(query, context, "Теми 25-32 📝", reply_markup=topics_keyboard_vishmat4())
+# -----------------------------------------------------------------------------------------------------------------------
+    elif query.data == "topics_keyboard_OrgItBizn":
+        await replace_message(query, context, "Показані всі теми по організації IT бізнесу 📝", reply_markup=topics_keyboard_OrgItBizn())
+# -----------------------------------------------------------------------------------------------------------------------
+    elif query.data == "back_to_topicsOrgItBizn":
+        await replace_message(
+            query,
+            context,
+            "Ви обрали Організацію IT бізнесу. Оберіть тему: 💼",
+            reply_markup=topics_keyboard_OrgItBizn()
+        )
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "help_command":
         help_text = (
@@ -192,18 +236,30 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data in PDF_FILES:
         await context.bot.send_message(chat_id=chat_id, text="Завантажую файл, зачекайте... ⏳")
         file_path = PDF_FILES[query.data]
+
+        # Перевірка, чи існує файл
         if os.path.exists(file_path):
             try:
                 with open(file_path, 'rb') as f:
                     await context.bot.send_document(chat_id=chat_id, document=f)
+            except PermissionError:
+                await context.bot.send_message(chat_id=chat_id, text="У мене немає доступу до цього файлу. Спробуйте ще раз пізніше 🔒❌")
             except Exception as e:
                 await context.bot.send_message(chat_id=chat_id, text=f"Сталася помилка при відправці файлу❌⚠️{e}")
-                # ------------------------------------------------------------------------------------------------------
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text="⬅️ Повернутись до списку тем:",
-                reply_markup=back_to_topics_keyboard_vishmat()
-            )
+
+            # Визначаємо предмет за префіксом в query.data
+            if query.data.startswith("VishMat"):
+                await context.bot.send_message(
+                    chat_id=chat_id,
+                    text="⬅️ Повернутись до списку тем:",
+                    reply_markup=back_to_topics_keyboard_vishmat()
+                )
+            elif query.data.startswith("OrgItBizn"):
+                await context.bot.send_message(
+                    chat_id=chat_id,
+                    text="⬅️ Повернутись до списку тем:",
+                    reply_markup=back_to_topics_keyboard_OrgItBizn()
+                )
         else:
             await context.bot.send_message(chat_id=chat_id, text="Файл не знайдено 😢❌")
 #-----------------------------------------------------------------------------------------------------------------------
