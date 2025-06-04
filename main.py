@@ -15,12 +15,25 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("📋Список доступних команд /help🛠️")
     await update.message.reply_text("🎓Ось доступні предмети:📌", reply_markup=main_keyboard())
 #-----------------------------------------------------------------------------------------------------------------------
+async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    about_text = (
+        "👋 Привіт! Я бот для збереження конспектів 📚\n\n"
+        "Тут ти можеш швидко знаходити і завантажувати лекції з різних предметів.\n"
+        "Команди:\n"
+        "/start - Почати роботу з ботом\n"
+        "/list - Список доступних предметів\n"
+        "/help - Допомога по командам\n"
+        "/about - Інформація про бота\n\n"
+        "Створено з ❤️ для твого зручного навчання!"
+    )
+    await update.message.reply_text(about_text)
+# -----------------------------------------------------------------------------------------------------------------------
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("⬅️ В головне меню", callback_data='main_keyboard')]
     ]
     await update.message.reply_text(
-        "📋Список доступних команд:\n/list - Список доступних предметів\n/help - список команд💡",
+        "📋Список доступних команд:\n/list - Список доступних предметів\n/help - список команд\n/about - інформація про бота💡",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 #-----------------------------------------------------------------------------------------------------------------------
@@ -160,6 +173,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 if __name__ == '__main__':
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("about", about_command))
     app.add_handler(CommandHandler("list", show_subjects))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CallbackQueryHandler(button_handler))
