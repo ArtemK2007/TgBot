@@ -51,7 +51,8 @@ def topics_keyboard_vishmat():
         [InlineKeyboardButton("📌Тема 7. Чудові границі Неперервність функції", callback_data='VishMat_Lec7')],
         [InlineKeyboardButton("📌Тема 8. Диференціальне числення", callback_data='VishMat_Lec8')],
         [InlineKeyboardButton("➡️Наступна сторінка", callback_data='topics_keyboard_vishmat2')],
-        [InlineKeyboardButton("⬅️Назад", callback_data='back_to_subjects')]
+        [InlineKeyboardButton("⬅️Назад", callback_data='back_to_subjects')],
+        [InlineKeyboardButton("⬅️В головне меню", callback_data='main_keyboard')]
     ]
     return InlineKeyboardMarkup(keyboard)
 #-----------------------------------------------------------------------------------------------------------------------
@@ -66,7 +67,8 @@ def topics_keyboard_vishmat2():
         [InlineKeyboardButton("📌Тема 15. Визначений інтеграл", callback_data='VishMat_Lec15')],
         [InlineKeyboardButton("📌Тема 16. Застосування визначених інтегралів до розв'язання задач", callback_data='VishMat_Lec16')],
         [InlineKeyboardButton("➡️Наступна сторінка", callback_data='topics_keyboard_vishmat3')],
-        [InlineKeyboardButton("⬅️Назад", callback_data='back_to_topics')]
+        [InlineKeyboardButton("⬅️Назад", callback_data='back_to_topics')],
+        [InlineKeyboardButton("⬅️В головне меню", callback_data='main_keyboard')]
     ]
     return InlineKeyboardMarkup(keyboard)
 #-----------------------------------------------------------------------------------------------------------------------
@@ -81,7 +83,8 @@ def topics_keyboard_vishmat3():
         [InlineKeyboardButton("📌Тема 23. Криволінійні інтеграли", callback_data='VishMat_Lec23')],
         [InlineKeyboardButton("📌Тема 24. Поверхневі інтеграли", callback_data='VishMat_Lec24')],
         [InlineKeyboardButton("➡️Наступна сторінка", callback_data='topics_keyboard_vishmat4')],
-        [InlineKeyboardButton("⬅️Назад", callback_data='topics_keyboard_vishmat2')]
+        [InlineKeyboardButton("⬅️Назад", callback_data='topics_keyboard_vishmat2')],
+        [InlineKeyboardButton("⬅️В головне меню", callback_data='main_keyboard')]
     ]
     return InlineKeyboardMarkup(keyboard)
 #-----------------------------------------------------------------------------------------------------------------------
