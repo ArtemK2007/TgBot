@@ -154,11 +154,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await replace_message(query, context, "Теми 25-32 📝", reply_markup=topics_keyboard_vishmat4())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "help_command":
-        await replace_message(query, context,         "📋 Список доступних команд:\n"
-        "/list — список доступних предметів\n"
-        "/help — список команд\n"
-        "/about — інформація про бота 💡",
-                              reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ В головне меню", callback_data='main_keyboard')]]))
+        help_text = (
+            "📋 Список доступних команд:\n"
+            "/list — список доступних предметів\n"
+            "/help — список команд\n"
+            "/about — інформація про бота 💡"
+        )
+        keyboard = [[InlineKeyboardButton("⬅️ В головне меню", callback_data='main_keyboard')]]
+        await replace_message(
+            query,
+            context,
+            help_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data in PDF_FILES:
         file_path = PDF_FILES[query.data]
