@@ -2,28 +2,29 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 import os
+base_dir = os.path.abspath(os.path.dirname(__file__))
+base_path = os.path.join(base_dir, "VishMat")
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-base_path = r"C:\Users\artem\Desktop\TgBot\VishMat"
 PDF_FILES = {
-    f"VishMat_Lec{i}": fr"{base_path}\lec{i}.pdf"
+    f"VishMat_Lec{i}": os.path.join(base_path, f"lec{i}.pdf")
     for i in range(1, 33)
 }
 #-----------------------------------------------------------------------------------------------------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Привіт👋 Я бот для збереження твоїх конспектів 📚✨.")
-    await update.message.reply_text("📋Список доступних команд /help🛠️")
-    await update.message.reply_text("🎓Ось доступні предмети:📌", reply_markup=main_keyboard())
+    await update.message.reply_text("Привіт! 👋 Я бот для збереження твоїх конспектів 📚✨.")
+    await update.message.reply_text("📋 Список доступних команд: /help 🛠️")
+    await update.message.reply_text("🎓 Ось доступні предмети:", reply_markup=main_keyboard())
 #-----------------------------------------------------------------------------------------------------------------------
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     about_text = (
         "👋 Привіт! Я бот для збереження конспектів 📚\n\n"
-        "Тут ти можеш швидко знаходити і завантажувати лекції з різних предметів.\n"
+        "Тут ти можеш швидко знаходити та завантажувати лекції з різних предметів.\n"
         "Команди:\n"
-        "/start - Почати роботу з ботом\n"
-        "/list - Список доступних предметів\n"
-        "/help - Допомога по командам\n"
-        "/about - Інформація про бота\n\n"
+        "/start — почати роботу з ботом\n"
+        "/list — список доступних предметів\n"
+        "/help — допомога по командам\n"
+        "/about — інформація про бота\n\n"
         "Створено з ❤️ для твого зручного навчання!"
     )
     await update.message.reply_text(about_text)
@@ -32,10 +33,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("⬅️ В головне меню", callback_data='main_keyboard')]
     ]
-    await update.message.reply_text(
-        "📋Список доступних команд:\n/list - Список доступних предметів\n/help - список команд\n/about - інформація про бота💡",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+    help_text = (
+        "📋 Список доступних команд:\n"
+        "/list — список доступних предметів\n"
+        "/help — список команд\n"
+        "/about — інформація про бота 💡"
     )
+    await update.message.reply_text(help_text, reply_markup=InlineKeyboardMarkup(keyboard))
 #-----------------------------------------------------------------------------------------------------------------------
 async def show_subjects(update, context):
     await update.message.reply_text("Ось доступні предмети: 📚", reply_markup=main_keyboard())
@@ -129,7 +133,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=query.message.chat.id, text=text, reply_markup=reply_markup)
 # -----------------------------------------------------------------------------------------------------------------------
     if query.data == "VishMat":
-        await replace_message(query, context, "Ви обрали Вищу математику.📐 Оберіть тему: (Показані перші 8 тем).", reply_markup=topics_keyboard_vishmat())
+        await replace_message(query, context, "Ви обрали Вищу математику 📐 Оберіть тему (показані перші 8 тем):", reply_markup=topics_keyboard_vishmat())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "main_keyboard":
         await replace_message(query, context, "Ось доступні предмети: 🔍", reply_markup=main_keyboard())
@@ -141,16 +145,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await replace_message(query, context, "Ви обрали Вищу математику. Оберіть тему: 🔍", reply_markup=topics_keyboard_vishmat())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "topics_keyboard_vishmat2":
-        await replace_message(query, context, "Теми 9-16📝", reply_markup=topics_keyboard_vishmat2())
+        await replace_message(query, context, "Теми 9-16 📝", reply_markup=topics_keyboard_vishmat2())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "topics_keyboard_vishmat3":
-        await replace_message(query, context, "Теми 17-24📝", reply_markup=topics_keyboard_vishmat3())
+        await replace_message(query, context, "Теми 17-24 📝", reply_markup=topics_keyboard_vishmat3())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "topics_keyboard_vishmat4":
-        await replace_message(query, context, "Теми 25-32📝", reply_markup=topics_keyboard_vishmat4())
+        await replace_message(query, context, "Теми 25-32 📝", reply_markup=topics_keyboard_vishmat4())
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data == "help_command":
-        await replace_message(query, context, "Список доступних команд:\n/list - Список доступних предметів\n/help - список команд💡",
+        await replace_message(query, context,         "📋 Список доступних команд:\n"
+        "/list — список доступних предметів\n"
+        "/help — список команд\n"
+        "/about — інформація про бота 💡",
                               reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ В головне меню", callback_data='main_keyboard')]]))
 # -----------------------------------------------------------------------------------------------------------------------
     elif query.data in PDF_FILES:
@@ -168,7 +175,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=back_to_topics_keyboard_vishmat()
             )
         else:
-            await context.bot.send_message(chat_id=chat_id, text="Файл не знайдено😢❌")
+            await context.bot.send_message(chat_id=chat_id, text="Файл не знайдено 😢❌")
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     app = Application.builder().token(TOKEN).build()
